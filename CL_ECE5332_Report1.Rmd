@@ -1,0 +1,49 @@
+---
+title: "SemiconductorStatistics_Report 1"
+author: "Caleb Leonard"
+date: "September 14, 2025"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Statistics in Semiconductor Manufacturing: T-Tests
+
+With the initial 10 presample data points taken, at 0.05 significance level, power of 0.85, and detecting a mean shift of 0.1 nm from the targeted 32 nm gate critical dimension in one direction, 47 total data points should be collected. This is shown in the R code below
+
+```{r cars}
+#alpha = 0.05
+#beta = 0.15
+#power = 0.85
+#number of presamples = 10
+#target gate dimension = 32 nm
+#mean shift = 0.1 nm
+#presamples = (31.6, 32.1, 31.9, 31.7, 32.2, 31.8, 32.0, 31.5, 31.9, 31.7)
+#tool 1 data = (31.6, 32.1, 31.9, 31.7, 32.2, 31.8, 32.0, 31.5, 31.9, 31.7, 32.1, 32.0, 32.1, 32.3, 31.9, 31.9, 32.3, 32.2, 31.9, 32.1,31.9, 31.9, 32.1, 31.6, 31.6, 31.9, 31.8, 32.1, 31.8, 31.7, 32.3, 32.0, 32.0, 31.7, 31.9, 32.0, 31.7, 32.1, 31.9, 31.9, 31.9, 32.4, 32.0, 31.8, 32.2, 31.7, 31.9)
+
+presamples<-c(31.6, 32.1, 31.9, 31.7, 32.2, 31.8, 32.0, 31.5, 31.9, 31.7)
+sd(presamples) #determine standard deviation of presample data
+power.t.test(n=NULL,delta=0.1,sd=0.2221111,sig.level=0.05,
+             power=.85,type="one.sample",alternative="two.sided")
+```
+After taking 37 more measurements of wafers produced with Tool 1, it was determined the mean of gate critical dimension is 31.936 nm
+
+```{r}
+tool1data<-c(31.6, 32.1, 31.9, 31.7, 32.2, 31.8, 32.0, 31.5, 31.9, 31.7, 32.1, 32.0, 32.1, 32.3, 31.9, 31.9, 32.3, 32.2, 31.9, 32.1,31.9, 31.9, 32.1, 31.6, 31.6, 31.9, 31.8, 32.1, 31.8, 31.7, 32.3, 32.0, 32.0, 31.7, 31.9, 32.0, 31.7, 32.1, 31.9, 31.9, 31.9, 32.4, 32.0, 31.8, 32.2, 31.7, 31.9)
+t.test(tool1data, alternative="two.sided", mu=32)
+hist(tool1data, main="presamples", xlab="observations", ylab = "frequency", col="red")
+boxplot(tool1data, main="presamples",col="yellow")
+```
+
+To determine if Tool 1 and Tool 2 produce wafers with the same mean gate critical dimension, the following R code was used to determine a sample size of 14 measurements need to be taken from Tool 2.
+
+```{r}
+power.t.test(n=NULL,delta=0.2,sd=0.2079146,sig.level=0.05,
+             power=.90,type="one.sample",alternative="two.sided")
+
+```
+
