@@ -1,0 +1,74 @@
+---
+title: "CL_ECE5332_Report2"
+author: "Caleb Leonard"
+date: "September 26, 2025"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(qcc)
+```
+
+## Retrospective Analysis of Silicon Wafer Resistivity
+
+Previous to my employment of this semiconductor fabrication company, Y-Fab, 30 subgroups of 5 measurements of wafer resistivity (in ohm-cm) were taken, that will be denoted as retrospective resistivity, found at: "https://github.com/Caleb-Leonard/Statistical-Methods-in-Semiconductor-Manufacturing/blob/main/retrospective_resistivity.csv". After loading this dataset into R, an initial X-Bar chart and a R Chart was constructed, shown below.
+
+```{r Initial Retrospective X-bar and R Charts}
+#Retrospective Analysis 
+etch_retro<-read.csv("https://raw.githubusercontent.com/Caleb-Leonard/Statistical-Methods-in-Semiconductor-Manufacturing/refs/heads/main/retrospective_resistivity.csv",
+                    header=FALSE)
+
+qcc(data=etch_retro,
+    type="xbar",
+    sizes=5)
+qcc(data=etch_retro,
+    type="R",
+    sizes=5)
+
+```
+
+
+Subgroup 6 and Subgroup 16 were deemed out-of-control, exceeding the upper control limit and the lower control limit respectively. These Subgroups were then excluded from the dataset, which is plotted in new X-Bar and R Charts below.
+
+```{r Retrospective X-bar and R Charts with Subgroups 6 and 16 Removed}
+etch_retro<-etch_retro[-6,] #remove out-of-control subgroup 6
+
+qcc(data=etch_retro,
+    type="xbar",
+    sizes=5)
+qcc(data=etch_retro,
+    type="R",
+    sizes=5)
+
+etch_retro<-etch_retro[-15,] #remove out-of-control subgroup 16, now subgroup 15 after removing subgroup 6
+
+qcc(data=etch_retro,
+    type="xbar",
+    sizes=5)
+qcc(data=etch_retro,
+    type="R",
+    sizes=5)
+```
+
+While still in-control, the finalized Subgroups 15 and 23 are noted because of their range being significantly higher than the rest of the Subgroups, at 2.05 and 2.19 respectively.
+
+## Online Analysis of Silicon Wafer Resistivity
+
+Since the retrospective analysis was performed and new control limits were established, a new dataset of 10 subgroups of 5 measurements was taken. This dataset will be denoted as online resistivity, found at: "https://github.com/Caleb-Leonard/Statistical-Methods-in-Semiconductor-Manufacturing/blob/main/online_resistivity.csv". After loading this dataset into R, an initial X-Bar chart and a R Chart was constructed, shown below. The X-Bar Chart as given a center of 9.966048 and standard deviation of 0.501233, both taken from the finalized Retrospective X-Bar Chart. The R Chart was given a center of 1.165868 and a standard deviation of 0.501233, both taken from the finalized Retrospective R Chart.
+
+```{r Initial Online X-bar and R Charts}
+#Online Analysis 
+etch_online<-read.csv("https://raw.githubusercontent.com/Caleb-Leonard/Statistical-Methods-in-Semiconductor-Manufacturing/refs/heads/main/online_resistivity.csv",
+                    header=FALSE)
+
+qcc(data=etch_online,
+    type="xbar",
+    sizes=5, center=9.966048,std.dev = 0.501233)
+
+qcc(data=etch_online,
+    type="R",
+    sizes=5, center=1.165868,std.dev = 0.501233)
+```
+While no Subgroups were deemed out-of-control, Subgroups 4 and 6 were noted due to their higher mean and Subgroups 1, 5, 7, and 10 were noted for their low range. The only sign that could show the process might be shifting out of control is the slope rate going from Subgroup 5 to 6 and from 6 to 7. This is not definitive as there is limited data to draw this conclusion from.
+
