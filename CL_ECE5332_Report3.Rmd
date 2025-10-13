@@ -1,0 +1,74 @@
+---
+title: "CL_ECE5332_Report3"
+author: "Caleb Leonard"
+date: "October 12, 2025"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#Uncomment line below to install qcc package
+#install.packages("qcc")
+library(qcc)
+
+?qcc
+```
+
+## Defect Detection
+
+### Retrospective Analysis
+
+```{r Retrospective Wafer Defect Detection}
+retro_wafer_defects<-read.csv("https://raw.githubusercontent.com/Caleb-Leonard/Statistical-Methods-in-Semiconductor-Manufacturing/refs/heads/main/wafer_defect_retrospective.csv", header=FALSE)
+
+qcc(data=retro_wafer_defects,sizes= length(retro_wafer_defects),type="c") #initial C control chart trial
+
+retro_wafer_defects2<-retro_wafer_defects[retro_wafer_defects<=8.196152 & retro_wafer_defects>=0] #remove datapoints outside control limits 
+
+qcc(data=retro_wafer_defects2,sizes=length(retro_wafer_defects2),type="c") #second trial
+```
+There were no groups in the retrospective wafer defect detection that were outside of the control limits, nor were there any violating runs. There were a few groups to watch for as they were close to being out of limits as well as having 0 defects. There were no groups removed as they were all within the control limits.
+
+### Online Analysis
+
+```{r Online Wafer Defect Detection}
+online_wafer_defects<-read.csv("https://raw.githubusercontent.com/Caleb-Leonard/Statistical-Methods-in-Semiconductor-Manufacturing/refs/heads/main/wafer_defect_online.csv", header=FALSE)
+
+qcc(data=online_wafer_defects,sizes=30,type="c") #standalone online C chart
+qcc(data=retro_wafer_defects2,sizes=length(retro_wafer_defects2),type="c", newdata = online_wafer_defects) #C chart with restrospective data as calibration with online data as new data
+
+```
+A standalone C chart with online defect detection data was used to understand the data without comparing to the retrospective defect detection data. Then, the online defect detection data was compared to respective data control limits, where there were less overall defects.
+
+## Semiconductor Testing
+
+### Retrospective Analysis
+
+```{r Retrospective Semiconductor Testing}
+retro_chip_defects<-read.csv("https://raw.githubusercontent.com/Caleb-Leonard/Statistical-Methods-in-Semiconductor-Manufacturing/refs/heads/main/retrospective_semiconductor_np_chart.csv",
+header=FALSE)
+
+qcc(data=retro_chip_defects,sizes=100,type="np") #Initial NP chart
+
+retro_chip_defects2<-retro_chip_defects[retro_chip_defects<=10.03176 & retro_chip_defects>=0] #remove datapoints outside control limits 
+
+qcc(data=retro_chip_defects2,sizes=length(retro_chip_defects2),type="np") #second trial
+```
+On the inital NP control chart, there was one group out of control. This group was removed and the control chart and its statistics were recalculated.
+
+
+### Online  Analysis
+```{r Online Semiconductor Testing}
+online_chip_defects<-read.csv("https://raw.githubusercontent.com/Caleb-Leonard/Statistical-Methods-in-Semiconductor-Manufacturing/refs/heads/main/online_monitoring_semiconductor_np_chart.csv", header=FALSE)
+
+qcc(data=online_chip_defects,sizes=50,type="np") #standalone online NP chart
+
+qcc(data=retro_chip_defects2,sizes=length(retro_chip_defects2),type="np", newdata = online_chip_defects, newsizes = length(online_chip_defects), ylim=c(0,10), limits = c(0, 9.843098)) #NP chart with restrospective data as calibration with online data as new data
+
+online_chip_defects2<-online_chip_defects<-online_chip_defects[online_chip_defects<=9.843098 & online_chip_defects>=0] #remove datapoints outside of control limits
+
+qcc(data=retro_chip_defects2,sizes=length(retro_chip_defects2),type="np", newdata = online_chip_defects2, newsizes = length(online_chip_defects2), ylim=c(0,10), limits = c(0, 9.843098)) #NP chart with restrospective data as calibration with refined online data as new data
+
+```
+A standalone NP chart with online defect detection data was used to understand the data without comparing to the retrospective defect detection data. There was one group in the online chip defect data that was out of control and thus removed. Then, the online defect detection data was compared to respective data control limits, where there were less overall defects. In the end, there were two violating runs and no groups were out of control
